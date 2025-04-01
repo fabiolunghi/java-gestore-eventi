@@ -3,10 +3,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class Evento {
-    String titolo;
-    LocalDate data;
-    int totalePosti;
-    int postiPrenotati;
+    private String titolo;
+    private LocalDate data;
+    private final int postiTotali;
+    private int postiPrenotati;
 
     public Evento(String titolo, LocalDate data, int postiTotali) throws IllegalArgumentException {
         if (data.isBefore(LocalDate.now())) {
@@ -17,7 +17,7 @@ public class Evento {
         }
         this.titolo = titolo;
         this.data = data;
-        this.totalePosti = totalePosti;
+        this.postiTotali = postiTotali;
         this.postiPrenotati = 0;
     }
 
@@ -25,42 +25,49 @@ public class Evento {
         return titolo;
     }
 
+    public void setTitolo(String titolo) {
+        this.titolo = titolo;
+    }
+
     public LocalDate getData() {
         return data;
     }
 
-    public int getTotalePosti() {
-        return totalePosti;
+    public void setData(LocalDate data) {
+        if (data.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("La data dell'evento non può essere nel passato.");
+        }
+        this.data = data;
+    }
+
+    public int getPostiTotali() {
+        return postiTotali;
     }
 
     public int getPostiPrenotati() {
         return postiPrenotati;
     }
 
-    public void setTitolo(String titolo) {
-        this.titolo = titolo;
-    }
-
-    public void setData(LocalDate data) {
-        this.data = data;
-    }
-    public  void prenota () throws IllegalStateException {
+    public void prenota() throws IllegalStateException {
         if (data.isBefore(LocalDate.now())) {
-            throw new IllegalStateException("Impossibile prenotare, l'evento è già passato");
-        } 
-        if (postiPrenotati > totalePosti) {
-            throw new IllegalStateException("Impossibile prenotare, posti esauriti");
+            throw new IllegalStateException("L'evento è già passato, non è possibile prenotare.");
+        }
+        if (postiPrenotati >= postiTotali) {
+            throw new IllegalStateException("Non ci sono posti disponibili.");
         }
         postiPrenotati++;
     }
-    public void disdici () throws IllegalStateException {
+
+    public void disdici() throws IllegalStateException {
         if (data.isBefore(LocalDate.now())) {
-            throw new IllegalStateException("Impossibile prenotare, l'evento è già passato");
-        } if (postiPrenotati < 0) {
-            throw new IllegalStateException("Impossibile disdire, non esiste alcuna prenotazione");
+            throw new IllegalStateException("L'evento è già passato, non è possibile disdire.");
+        }
+        if (postiPrenotati <= 0) {
+            throw new IllegalStateException("Non ci sono prenotazioni da disdire.");
         }
         postiPrenotati--;
     }
+
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
